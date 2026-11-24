@@ -1,0 +1,83 @@
+import qrcode
+import os
+
+# Step 1: Define the hotel menu
+menu = {
+    "1": {"item": "Paneer Butter Naan", "price": 50},
+    "2": {"item": "Chicken Biryani", "price": 300},
+    "3": {"item": "Veg Fried Rice", "price": 180},
+    "4": {"item": "Tandoori Roti", "price": 25},
+    "5": {"item": "Gulab Jamun", "price": 50},
+    "6": {"item": "Cold Drink", "price": 40},
+}
+
+# Step 2: Display the menu
+print("\n📜 Welcome to Royal Palace Hotel 🏨")
+print("----------- MENU -----------")
+
+# ✅ Correct menu display loop
+for key, value in menu.items():
+    print(f"{key}. {value['item']} - ₹{value['price']}")
+
+print("-----------------------------")
+
+# Step 3: Take orders from the customer
+order = {}  # To store ordered items and quantities
+
+while True:
+    choice = input("\nEnter the item number you want to order (or type 'done' to finish): ").strip()
+
+    if choice.lower() == 'done':
+        break
+
+    if choice not in menu:
+        print("❌ Invalid item number! Please try again.")
+        continue
+
+    try:
+        quantity = int(input(f"Enter quantity for {menu[choice]['item']}: "))
+    except ValueError:
+        print("❌ Please enter a valid number!")
+        continue
+
+    if quantity <= 0:
+        print("❌ Quantity must be greater than 0!")
+        continue
+
+    # Add or update order
+    order[choice] = order.get(choice, 0) + quantity
+
+# Step 4: Show bill and calculate total
+if not order:
+    print("\n⚠️ No items ordered. Thank you for visiting!")
+    exit()
+
+print("\n✅ Order completed!")
+print("\n------------ BILL ------------")
+total_amount = 0
+for key, qty in order.items():
+    item_name = menu[key]['item']
+    item_price = menu[key]['price']
+    total = item_price * qty
+    total_amount += total
+    print(f"{item_name} x {qty} = ₹{total}")
+
+print("-------------------------------")
+print(f"Total Bill: ₹{total_amount}")
+print("-------------------------------")
+
+# Step 5: Generate payment QR code
+payment_link = f"upi://pay?pa=7011343112@upi&pn=Royal+Palace+Hotel&am={total_amount}&cu=INR"
+qr_code = qrcode.make(payment_link)
+qr_code.save("payment_qr.png")
+
+print("\n💳 Payment QR code generated successfully!")
+print("➡ Please open or scan 'payment_qr.png' to complete your payment.\n")
+
+# Step 6: Try to open the QR image automatically
+try:
+    os.startfile("payment_qr.png")  # Windows only
+except Exception:
+    print("⚠️ Please open 'payment_qr.png' manually to scan the QR code.")
+
+print("🙏 Thank you for dining with us! Have a great day! 🍽️")
